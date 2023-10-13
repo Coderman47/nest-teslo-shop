@@ -1,8 +1,13 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, Query } from '@nestjs/common';
-import { ProductService } from './product.service';
+
+import { Auth } from 'src/auth/decorators';
+
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
+
+import { ProductService } from './product.service';
+import { ValidRoles } from 'src/auth/interfaces';
 
 
 // Los controladores deben de tener la menor cantidad de lógica. 
@@ -11,13 +16,14 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Post()
+  @Auth( ValidRoles.admin )
   create(@Body() createProductDto: CreateProductDto) {
     return this.productService.create(createProductDto);
   }
 
   @Get()
   findAll(@Query() paginationDto: PaginationDto) {
-    console.log(paginationDto)
+    // console.log(paginationDto)
     return this.productService.findAll(paginationDto);
   }
 
@@ -27,6 +33,7 @@ export class ProductController {
   }
 
   @Patch(':id')
+  @Auth( ValidRoles.admin )
   update(
     @Param('id', ParseUUIDPipe) id: string, 
     @Body() updateProductDto: UpdateProductDto
@@ -35,6 +42,7 @@ export class ProductController {
   }
 
   @Delete(':id')
+  @Auth( ValidRoles.admin )
   remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.productService.remove(id);
   }
